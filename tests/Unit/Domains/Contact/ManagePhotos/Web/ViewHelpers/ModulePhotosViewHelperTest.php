@@ -15,8 +15,6 @@ class ModulePhotosViewHelperTest extends TestCase
     /** @test */
     public function it_gets_the_data_needed_for_the_view(): void
     {
-        config(['services.uploadcare.public_key' => '123']);
-
         $contact = Contact::factory()->create();
         $file = File::factory()->create([
             'vault_id' => $contact->vault_id,
@@ -26,24 +24,25 @@ class ModulePhotosViewHelperTest extends TestCase
         $array = ModulePhotosViewHelper::data($contact);
 
         $this->assertEquals(
-            4,
+            3,
             count($array)
         );
 
         $this->assertArrayHasKey('photos', $array);
-        $this->assertArrayHasKey('uploadcare', $array);
         $this->assertArrayHasKey('canUploadFile', $array);
         $this->assertArrayHasKey('url', $array);
 
-        $this->assertEquals(
-            '123',
-            $array['uploadcare']['publicKey']
-        );
         $this->assertFalse($array['canUploadFile']);
         $this->assertEquals(
             [
-                'index' => env('APP_URL').'/vaults/'.$contact->vault->id.'/contacts/'.$contact->id.'/photos',
-                'store' => env('APP_URL').'/vaults/'.$contact->vault->id.'/contacts/'.$contact->id.'/photos',
+                'index' => route('contact.photo.index', [
+                    'vault' => $contact->vault_id,
+                    'contact' => $contact->id,
+                ]),
+                'store' => route('contact.photo.store', [
+                    'vault' => $contact->vault_id,
+                    'contact' => $contact->id,
+                ]),
             ],
             $array['url']
         );
@@ -68,10 +67,18 @@ class ModulePhotosViewHelperTest extends TestCase
                 'mime_type' => $file->mime_type,
                 'size' => '123B',
                 'url' => [
-                    'display' => 'https://ucarecdn.com/123/-/scale_crop/300x300/smart/-/format/auto/-/quality/smart_retina/',
+                    'display' => $file->cdn_url,
                     'download' => $file->cdn_url,
-                    'show' => env('APP_URL').'/vaults/'.$contact->vault->id.'/contacts/'.$contact->id.'/photos/'.$file->id,
-                    'destroy' => env('APP_URL').'/vaults/'.$contact->vault->id.'/contacts/'.$contact->id.'/photos/'.$file->id,
+                    'show' => route('contact.photo.show', [
+                        'vault' => $contact->vault_id,
+                        'contact' => $contact->id,
+                        'photo' => $file->id,
+                    ]),
+                    'destroy' => route('contact.photo.destroy', [
+                        'vault' => $contact->vault_id,
+                        'contact' => $contact->id,
+                        'photo' => $file->id,
+                    ]),
                 ],
             ],
             $array

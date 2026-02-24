@@ -34,7 +34,7 @@ import Religion from '@/Shared/Modules/Religion.vue';
 import Posts from '@/Shared/Modules/Posts.vue';
 import LifeEvent from '@/Shared/Modules/LifeEvent.vue';
 import QuickFacts from '@/Shared/Modules/QuickFacts.vue';
-import Uploadcare from '@/Components/Uploadcare.vue';
+import FileUploader from '@/Components/FileUploader.vue';
 import { ChevronRight } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -100,9 +100,9 @@ const toggleArchive = () => {
 const onSuccess = (file) => {
   form.uuid = file.uuid;
   form.name = file.name;
-  form.original_url = file.originalUrl;
-  form.cdn_url = file.cdnUrl;
-  form.mime_type = file.mimeType;
+  form.original_url = file.original_url;
+  form.cdn_url = file.cdn_url;
+  form.mime_type = file.mime_type;
   form.size = file.size;
 
   upload();
@@ -233,17 +233,13 @@ const navigateToSelected = () => {
               </li>
               <!-- upload new avatar -->
               <li v-if="!data.avatar.hasFile" class="mb-2">
-                <Uploadcare
-                  v-if="data.avatar.uploadcare.publicKey && data.avatar.canUploadFile"
-                  :public-key="data.avatar.uploadcare.publicKey"
-                  :secure-signature="data.avatar.uploadcare.signature"
-                  :secure-expire="data.avatar.uploadcare.expire"
-                  :tabs="'file'"
-                  :preview-step="false"
+                <FileUploader
+                  v-if="data.avatar.canUploadFile"
+                  :images-only="true"
                   @success="onSuccess"
                   @error="onError">
                   <span class="cursor-pointer text-blue-500 hover:underline"> {{ $t('Upload photo as avatar') }} </span>
-                </Uploadcare>
+                </FileUploader>
               </li>
               <!-- archive contact -->
               <li v-if="data.listed && data.options.can_be_archived" class="mb-2">

@@ -21,7 +21,6 @@ class ModuleDocumentsViewHelper
 
         return [
             'documents' => $documentsCollection,
-            'uploadcare' => StorageHelper::uploadcare(),
             'canUploadFile' => StorageHelper::canUploadFile($contact->vault->account),
             'url' => [
                 'store' => route('contact.document.store', [

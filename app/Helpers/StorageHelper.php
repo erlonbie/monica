@@ -4,7 +4,6 @@ namespace App\Helpers;
 
 use App\Models\Account;
 use App\Models\File;
-use Uploadcare\Security\Signature;
 
 class StorageHelper
 {
@@ -30,17 +29,4 @@ class StorageHelper
         return $totalSizeInBytes < $accountLimit;
     }
 
-    /**
-     * Get the Uploadcare data needed for the views.
-     */
-    public static function uploadcare(): array
-    {
-        $signature = config('services.uploadcare.private_key') != '' ? new Signature(config('services.uploadcare.private_key')) : null;
-
-        return [
-            'publicKey' => config('services.uploadcare.public_key'),
-            'signature' => optional($signature)->getSignature(),
-            'expire' => optional(optional($signature)->getExpire())->getTimestamp(),
-        ];
-    }
 }

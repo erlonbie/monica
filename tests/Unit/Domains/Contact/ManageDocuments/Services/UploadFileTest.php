@@ -3,7 +3,6 @@
 namespace Tests\Unit\Domains\Contact\ManageDocuments\Services;
 
 use App\Domains\Contact\ManageDocuments\Services\UploadFile;
-use App\Exceptions\EnvVariablesNotSetException;
 use App\Exceptions\NotEnoughPermissionException;
 use App\Models\Account;
 use App\Models\File;
@@ -21,9 +20,6 @@ class UploadFileTest extends TestCase
     /** @test */
     public function it_uploads_a_file(): void
     {
-        config(['services.uploadcare.public_key' => 'test']);
-        config(['services.uploadcare.private_key' => 'test']);
-
         $regis = $this->createUser();
         $vault = $this->createVault($regis->account);
         $vault = $this->setPermissionInVault($regis, Vault::PERMISSION_EDIT, $vault);
@@ -34,9 +30,6 @@ class UploadFileTest extends TestCase
     /** @test */
     public function it_fails_if_wrong_parameters_are_given(): void
     {
-        config(['services.uploadcare.public_key' => 'test']);
-        config(['services.uploadcare.private_key' => 'test']);
-
         $request = [
             'title' => 'Ross',
         ];
@@ -46,32 +39,8 @@ class UploadFileTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_an_exception_when_env_keys_are_not_set(): void
-    {
-        config(['services.uploadcare.public_key' => null]);
-        config(['services.uploadcare.public_key' => null]);
-
-        $regis = $this->createUser();
-        $vault = $this->createVault($regis->account);
-        $vault = $this->setPermissionInVault($regis, Vault::PERMISSION_EDIT, $vault);
-
-        $this->expectException(EnvVariablesNotSetException::class);
-        $this->executeService($regis, $regis->account, $vault);
-
-        config(['services.uploadcare.public_key' => 'test']);
-        $this->expectException(EnvVariablesNotSetException::class);
-        $this->executeService($regis, $regis->account, $vault);
-
-        config(['services.uploadcare.private_key' => 'test']);
-        $this->executeService($regis, $regis->account, $vault);
-    }
-
-    /** @test */
     public function it_fails_if_user_doesnt_belong_to_account(): void
     {
-        config(['services.uploadcare.public_key' => 'test']);
-        config(['services.uploadcare.private_key' => 'test']);
-
         $this->expectException(ModelNotFoundException::class);
 
         $regis = $this->createUser();
@@ -85,9 +54,6 @@ class UploadFileTest extends TestCase
     /** @test */
     public function it_fails_if_user_doesnt_have_right_permission_in_initial_vault(): void
     {
-        config(['services.uploadcare.public_key' => 'test']);
-        config(['services.uploadcare.private_key' => 'test']);
-
         $this->expectException(NotEnoughPermissionException::class);
 
         $regis = $this->createUser();

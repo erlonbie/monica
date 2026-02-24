@@ -74,7 +74,6 @@ class PostEditViewHelper
             'tags_in_post' => $tagsAssociatedWithPostCollection,
             'tags_in_vault' => $tagsInVaultCollection,
             'journal_metrics' => self::journalMetrics($post),
-            'uploadcare' => StorageHelper::uploadcare(),
             'canUploadFile' => StorageHelper::canUploadFile($journal->vault->account),
             'journal' => [
                 'name' => $journal->name,
@@ -184,7 +183,7 @@ class PostEditViewHelper
             'size' => FileHelper::formatFileSize($file->size),
             'mime_type' => $file->mime_type,
             'url' => [
-                'show' => 'https://ucarecdn.com/'.$file->uuid.'/-/scale_crop/75x75/smart/-/format/auto/-/quality/smart_retina/',
+                'show' => $file->cdn_url,
                 'destroy' => route('post.photos.destroy', [
                     'vault' => $journal->vault_id,
                     'journal' => $journal->id,
