@@ -51,7 +51,7 @@ class JournalPhotoIndexViewHelper
                     'journal' => $post->journal->id,
                     'post' => $post->id,
                 ]),
-                'display' => 'https://ucarecdn.com/'.$file->uuid.'/-/scale_crop/200x200/smart/-/format/auto/-/quality/smart_retina/',
+                'display' => $file->cdn_url,
             ],
         ];
     }

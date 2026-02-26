@@ -40,7 +40,7 @@ class ContactPhotosShowViewHelperTest extends TestCase
                 'mime_type' => $file->mime_type,
                 'size' => '123B',
                 'url' => [
-                    'display' => 'https://ucarecdn.com/123/-/resize/1700x/-/format/auto/-/quality/smart_retina/',
+                    'display' => $file->cdn_url,
                     'download' => $file->cdn_url,
                     'show' => env('APP_URL').'/vaults/'.$contact->vault->id.'/contacts/'.$contact->id,
                     'index' => env('APP_URL').'/vaults/'.$contact->vault->id.'/contacts/'.$contact->id.'/photos',
