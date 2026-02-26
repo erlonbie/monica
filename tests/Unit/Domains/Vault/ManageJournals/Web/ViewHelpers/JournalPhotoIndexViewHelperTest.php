@@ -55,7 +55,7 @@ class JournalPhotoIndexViewHelperTest extends TestCase
                     'name' => $file->name,
                     'url' => [
                         'post' => env('APP_URL').'/vaults/'.$post->journal->vault_id.'/journals/'.$post->journal_id.'/posts/'.$post->id,
-                        'display' => 'https://ucarecdn.com/'.$file->uuid.'/-/scale_crop/200x200/smart/-/format/auto/-/quality/smart_retina/',
+                        'display' => $file->cdn_url,
                     ],
                 ],
             ],
@@ -87,7 +87,7 @@ class JournalPhotoIndexViewHelperTest extends TestCase
                 'name' => $file->name,
                 'url' => [
                     'post' => env('APP_URL').'/vaults/'.$post->journal->vault_id.'/journals/'.$post->journal_id.'/posts/'.$post->id,
-                    'display' => 'https://ucarecdn.com/'.$file->uuid.'/-/scale_crop/200x200/smart/-/format/auto/-/quality/smart_retina/',
+                    'display' => $file->cdn_url,
                 ],
             ],
             $array

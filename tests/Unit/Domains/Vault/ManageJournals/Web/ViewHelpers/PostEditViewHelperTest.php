@@ -58,7 +58,7 @@ class PostEditViewHelperTest extends TestCase
 
         $array = PostEditViewHelper::data($journal, $post, $user);
 
-        $this->assertCount(17, $array);
+        $this->assertCount(16, $array);
         $this->assertEquals(
             $post->id,
             $array['id']
@@ -83,10 +83,6 @@ class PostEditViewHelperTest extends TestCase
             ],
             $array['journal']
         );
-        $this->assertEquals(
-            '123',
-            $array['uploadcare']['publicKey']
-        );
         $this->assertTrue(
             $array['canUploadFile']
         );
@@ -107,7 +103,7 @@ class PostEditViewHelperTest extends TestCase
                     'size' => '123B',
                     'mime_type' => 'avatar',
                     'url' => [
-                        'show' => 'https://ucarecdn.com/'.$file->uuid.'/-/scale_crop/75x75/smart/-/format/auto/-/quality/smart_retina/',
+                        'show' => $file->cdn_url,
                         'destroy' => env('APP_URL').'/vaults/'.$vault->id.'/journals/'.$journal->id.'/posts/'.$post->id.'/photos/'.$file->id,
                     ],
                 ],

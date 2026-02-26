@@ -131,7 +131,7 @@ class PostShowViewHelperTest extends TestCase
                     'id' => $file->id,
                     'name' => $file->name,
                     'url' => [
-                        'display' => 'https://ucarecdn.com/'.$file->uuid.'/-/scale_crop/100x100/smart/-/format/auto/-/quality/smart_retina/',
+                        'display' => $file->cdn_url,
                     ],
                 ],
             ],

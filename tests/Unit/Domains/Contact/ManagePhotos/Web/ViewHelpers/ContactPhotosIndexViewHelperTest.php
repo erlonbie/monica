@@ -29,7 +29,7 @@ class ContactPhotosIndexViewHelperTest extends TestCase
         $array = ContactPhotosIndexViewHelper::data($files, $contact);
 
         $this->assertEquals(
-            5,
+            4,
             count($array)
         );
 
@@ -38,10 +38,6 @@ class ContactPhotosIndexViewHelperTest extends TestCase
                 'name' => $contact->name,
             ],
             $array['contact']
-        );
-        $this->assertEquals(
-            '123',
-            $array['uploadcare']['publicKey']
         );
         $this->assertTrue($array['canUploadFile']);
         $this->assertEquals(
@@ -72,7 +68,7 @@ class ContactPhotosIndexViewHelperTest extends TestCase
                 'mime_type' => $file->mime_type,
                 'size' => '123B',
                 'url' => [
-                    'display' => 'https://ucarecdn.com/123/-/scale_crop/400x400/smart/-/format/auto/-/quality/smart_retina/',
+                    'display' => $file->cdn_url,
                     'download' => $file->cdn_url,
                     'show' => env('APP_URL').'/vaults/'.$contact->vault->id.'/contacts/'.$contact->id.'/photos/'.$file->id,
                     'destroy' => env('APP_URL').'/vaults/'.$contact->vault->id.'/contacts/'.$contact->id.'/photos/'.$file->id,
