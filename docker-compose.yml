@@ -137,9 +137,9 @@ services:
       AWS_BUCKET: '${AWS_BUCKET:-local}'
     entrypoint: >
       /bin/sh -c "
-      /usr/bin/mc config host add myminio http://minio:9000 \${AWS_ACCESS_KEY_ID} \${AWS_SECRET_ACCESS_KEY};
+      /usr/bin/mc alias set myminio http://minio:9000 \${AWS_ACCESS_KEY_ID} \${AWS_SECRET_ACCESS_KEY};
       /usr/bin/mc mb myminio/\${AWS_BUCKET};
-      /usr/bin/mc policy set download myminio/\${AWS_BUCKET};
+      /usr/bin/mc anonymous set download myminio/\${AWS_BUCKET};
       exit 0;
       "
     networks:
