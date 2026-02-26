@@ -1,8 +1,8 @@
 services:
   laravel.test: &app
     build:
-      context: ./docker/8.4
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./docker/8.4/Dockerfile
       args:
         WWWGROUP: '${WWWGROUP}'
     image: sail-8.4/app
@@ -39,8 +39,8 @@ services:
       - mailpit
   laravel.queue:
     build:
-      context: ./docker/8.4
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./docker/8.4/Dockerfile
       args:
         WWWGROUP: '${WWWGROUP}'
     image: sail-8.4/app
@@ -67,8 +67,8 @@ services:
     command: 'php artisan queue:work --sleep=10 --timeout=0 --tries=3 --queue=high,default,low'
   laravel.cron:
     build:
-      context: ./docker/8.4
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./docker/8.4/Dockerfile
       args:
         WWWGROUP: '${WWWGROUP}'
     image: sail-8.4/app
