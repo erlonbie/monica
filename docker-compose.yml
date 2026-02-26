@@ -1,7 +1,7 @@
 services:
   laravel.test: &app
     build:
-      context: ./vendor/laravel/sail/runtimes/8.4
+      context: ./docker/8.4
       dockerfile: Dockerfile
       args:
         WWWGROUP: '${WWWGROUP}'
@@ -20,7 +20,7 @@ services:
       INITIAL_USER_EMAIL: '${INITIAL_USER_EMAIL}'
       INITIAL_USER_PASSWORD: '${INITIAL_USER_PASSWORD}'
     volumes:
-      - '.:/var/www/html'
+      - './.env:/var/www/html/.env'
     entrypoint: >
       /bin/sh -c "
       php artisan waitfordb &&
@@ -39,7 +39,7 @@ services:
       - mailpit
   laravel.queue:
     build:
-      context: ./vendor/laravel/sail/runtimes/8.4
+      context: ./docker/8.4
       dockerfile: Dockerfile
       args:
         WWWGROUP: '${WWWGROUP}'
@@ -53,7 +53,7 @@ services:
       XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
       IGNITION_LOCAL_SITES_PATH: '${PWD}'
     volumes:
-      - '.:/var/www/html'
+      - './.env:/var/www/html/.env'
     networks:
       - sail
     depends_on:
@@ -67,7 +67,7 @@ services:
     command: 'php artisan queue:work --sleep=10 --timeout=0 --tries=3 --queue=high,default,low'
   laravel.cron:
     build:
-      context: ./vendor/laravel/sail/runtimes/8.4
+      context: ./docker/8.4
       dockerfile: Dockerfile
       args:
         WWWGROUP: '${WWWGROUP}'
@@ -81,7 +81,7 @@ services:
       XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
       IGNITION_LOCAL_SITES_PATH: '${PWD}'
     volumes:
-      - '.:/var/www/html'
+      - './.env:/var/www/html/.env'
     networks:
       - sail
     depends_on:
@@ -106,7 +106,7 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
     volumes:
       - 'sail-mariadb:/var/lib/mysql'
-      - './vendor/laravel/sail/database/mysql/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh'
+      - './docker/mysql/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh'
     networks:
       - sail
     healthcheck:
