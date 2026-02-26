@@ -17,8 +17,17 @@ services:
       XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
       XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
       IGNITION_LOCAL_SITES_PATH: '${PWD}'
+      INITIAL_USER_EMAIL: '${INITIAL_USER_EMAIL}'
+      INITIAL_USER_PASSWORD: '${INITIAL_USER_PASSWORD}'
     volumes:
       - '.:/var/www/html'
+    entrypoint: >
+      /bin/sh -c "
+      php artisan waitfordb &&
+      php artisan migrate --force &&
+      php artisan db:seed --force &&
+      /usr/local/bin/start-container
+      "
     networks:
       - sail
     depends_on:
@@ -54,6 +63,7 @@ services:
       - meilisearch
       - minio
       - mailpit
+    restart: on-failure
     command: 'php artisan queue:work --sleep=10 --timeout=0 --tries=3 --queue=high,default,low'
   laravel.cron:
     build:
@@ -81,17 +91,18 @@ services:
       - meilisearch
       - minio
       - mailpit
+    restart: on-failure
     command: 'php artisan schedule:run'
   mariadb:
     image: 'mariadb:10'
     ports:
       - '${FORWARD_DB_PORT:-3306}:3306'
     environment:
-      MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+      MYSQL_ROOT_PASSWORD: secret
       MYSQL_ROOT_HOST: '%'
-      MYSQL_DATABASE: '${DB_DATABASE}'
-      MYSQL_USER: '${DB_USERNAME}'
-      MYSQL_PASSWORD: '${DB_PASSWORD}'
+      MYSQL_DATABASE: 'monica'
+      MYSQL_USER: 'monica'
+      MYSQL_PASSWORD: secret
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
     volumes:
       - 'sail-mariadb:/var/lib/mysql'
@@ -103,7 +114,7 @@ services:
         - CMD
         - mysqladmin
         - ping
-        - '-p${DB_PASSWORD}'
+        - '-psecret'
       retries: 3
       timeout: 5s
   redis:
