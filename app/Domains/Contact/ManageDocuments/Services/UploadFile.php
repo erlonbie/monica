@@ -2,7 +2,6 @@
 
 namespace App\Domains\Contact\ManageDocuments\Services;
 
-use App\Exceptions\EnvVariablesNotSetException;
 use App\Models\File;
 use App\Services\BaseService;
 
@@ -62,14 +61,6 @@ class UploadFile extends BaseService
 
     private function validate(): void
     {
-        if (is_null(config('services.uploadcare.private_key'))) {
-            throw new EnvVariablesNotSetException;
-        }
-
-        if (is_null(config('services.uploadcare.public_key'))) {
-            throw new EnvVariablesNotSetException;
-        }
-
         $this->validateRules($this->data);
     }
 

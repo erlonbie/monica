@@ -9,17 +9,9 @@
           {{ $t('Documents') }}
         </span>
       </div>
-      <uploadcare
-        v-if="data.uploadcare.publicKey && data.canUploadFile"
-        :public-key="data.uploadcare.publicKey"
-        :secure-signature="data.uploadcare.signature"
-        :secure-expire="data.uploadcare.expire"
-        :tabs="'file'"
-        :preview-step="false"
-        @success="onSuccess"
-        @error="onError">
+      <FileUploader v-if="data.canUploadFile" @success="onSuccess" @error="onError">
         <pretty-button :text="$t('Add a document')" :icon="'plus'" :class="'w-full sm:w-fit'" />
-      </uploadcare>
+      </FileUploader>
     </div>
 
     <!-- not enough space in storage -->
@@ -72,27 +64,18 @@
         {{ $t('There are no documents yet.') }}
       </p>
     </div>
-
-    <!-- uploadcare api key not set -->
-    <div
-      v-if="!data.uploadcare.publicKey"
-      class="mb-6 rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900">
-      <p class="p-5 text-center">
-        {{ $t('The keys to manage uploads have not been set in this Monica instance.') }}
-      </p>
-    </div>
   </div>
 </template>
 
 <script>
 import PrettyButton from '@/Shared/Form/PrettyButton.vue';
-import Uploadcare from '@/Components/Uploadcare.vue';
+import FileUploader from '@/Components/FileUploader.vue';
 import { CloudUpload } from 'lucide-vue-next';
 
 export default {
   components: {
     PrettyButton,
-    Uploadcare,
+    FileUploader,
     CloudUpload,
   },
 

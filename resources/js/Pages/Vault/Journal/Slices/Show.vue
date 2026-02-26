@@ -4,7 +4,7 @@ import { Link, useForm } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
 import Layout from '@/Layouts/Layout.vue';
 import ContactCard from '@/Shared/ContactCard.vue';
-import Uploadcare from '@/Components/Uploadcare.vue';
+import FileUploader from '@/Components/FileUploader.vue';
 
 const props = defineProps({
   layoutData: Object,
@@ -34,9 +34,9 @@ const upload = () => {
 const onSuccess = (file) => {
   form.uuid = file.uuid;
   form.name = file.name;
-  form.original_url = file.originalUrl;
-  form.cdn_url = file.cdnUrl;
-  form.mime_type = file.mimeType;
+  form.original_url = file.original_url;
+  form.cdn_url = file.cdn_url;
+  form.mime_type = file.mime_type;
   form.size = file.size;
 
   upload();
@@ -120,13 +120,9 @@ const destroy = () => {
       <div class="mx-auto max-w-4xl px-2 py-2 sm:px-6 sm:py-6 lg:px-8">
         <div>
           <!-- header image -->
-          <uploadcare
-            v-if="data.uploadcare.publicKey && data.canUploadFile && !localSlice.cover_image"
-            :public-key="data.uploadcare.publicKey"
-            :secure-signature="data.uploadcare.signature"
-            :secure-expire="data.uploadcare.expire"
-            :tabs="'file'"
-            :preview-step="false"
+          <file-uploader
+            v-if="data.canUploadFile && !localSlice.cover_image"
+            :images-only="true"
             @success="onSuccess"
             @error="onError">
             <div
@@ -146,16 +142,7 @@ const destroy = () => {
 
               <p class="text-sm text-gray-500">{{ $t('Add a header image') }}</p>
             </div>
-          </uploadcare>
-
-          <!-- uploadcare api key not set -->
-          <div
-            v-if="!data.uploadcare.publicKey"
-            class="mb-6 rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900">
-            <p class="p-5 text-center">
-              {{ $t('The keys to manage uploads have not been set in this Monica instance.') }}
-            </p>
-          </div>
+          </file-uploader>
 
           <!-- not enough storage -->
           <div

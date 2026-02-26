@@ -12,7 +12,7 @@ import TextArea from '@/Shared/Form/TextArea.vue';
 import Tags from '@/Pages/Vault/Journal/Post/Partials/Tags.vue';
 import SlicesOfLife from '@/Pages/Vault/Journal/Post/Partials/SlicesOfLife.vue';
 import PostMetrics from '@/Pages/Vault/Journal/Post/Partials/PostMetrics.vue';
-import Uploadcare from '@/Components/Uploadcare.vue';
+import FileUploader from '@/Components/FileUploader.vue';
 import ContactSelector from '@/Shared/Form/ContactSelector.vue';
 import JetConfirmationModal from '@/Components/Jetstream/ConfirmationModal.vue';
 import JetDangerButton from '@/Components/Jetstream/DangerButton.vue';
@@ -85,9 +85,9 @@ const debouncedWatch = debounce(() => {
 const onSuccess = (file) => {
   form.uuid = file.uuid;
   form.name = file.name;
-  form.original_url = file.originalUrl;
-  form.cdn_url = file.cdnUrl;
-  form.mime_type = file.mimeType;
+  form.original_url = file.original_url;
+  form.cdn_url = file.cdn_url;
+  form.mime_type = file.mime_type;
   form.size = file.size;
 
   upload();
@@ -245,13 +245,9 @@ const destroy = () => {
               </ul>
 
               <!-- upload component -->
-              <uploadcare
-                v-if="data.uploadcare.publicKey && data.canUploadFile"
-                :public-key="data.uploadcare.publicKey"
-                :secure-signature="data.uploadcare.signature"
-                :secure-expire="data.uploadcare.expire"
-                :tabs="'file'"
-                :preview-step="false"
+              <file-uploader
+                v-if="data.canUploadFile"
+                :images-only="true"
                 @success="onSuccess"
                 @error="onError">
                 <!-- case when there are no photos yet -->
@@ -281,16 +277,7 @@ const destroy = () => {
                     {{ $t('+ add another photo') }}
                   </p>
                 </div>
-              </uploadcare>
-
-              <!-- uploadcare api key not set -->
-              <div
-                v-if="!data.uploadcare.publicKey"
-                class="mb-6 rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900">
-                <p class="p-5 text-center">
-                  {{ $t('The keys to manage uploads have not been set in this Monica instance.') }}
-                </p>
-              </div>
+              </file-uploader>
 
               <!-- not enough storage -->
               <div
