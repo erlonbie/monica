@@ -23,12 +23,12 @@ services:
       - './.env:/var/www/html/.env'
     entrypoint: >
       /bin/sh -c "
-      php artisan waitfordb &&
-      php artisan migrate --force &&
-      php artisan db:seed --force &&
-      php artisan storage:link --force &&
       chown -R sail:sail /var/www/html/storage /var/www/html/bootstrap/cache &&
       chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache &&
+      gosu sail php artisan waitfordb &&
+      gosu sail php artisan migrate --force &&
+      gosu sail php artisan db:seed --force &&
+      gosu sail php artisan storage:link --force &&
       /usr/local/bin/start-container
       "
     networks:
