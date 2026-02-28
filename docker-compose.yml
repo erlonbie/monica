@@ -25,8 +25,10 @@ services:
     entrypoint: >
       /bin/sh -c "
       if [ ! -z \"$WWWUSER\" ]; then usermod -u \"$WWWUSER\" sail; fi &&
-      chown -R sail:sail /var/www/html &&
+      mkdir -p /var/www/html/storage/framework/sessions /var/www/html/storage/framework/views /var/www/html/storage/framework/cache /var/www/html/storage/logs &&
+      chown -R sail:sail /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public &&
       chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache &&
+      gosu sail php artisan config:clear &&
       gosu sail php artisan waitfordb &&
       gosu sail php artisan migrate --force &&
       gosu sail php artisan db:seed --force &&
@@ -40,7 +42,6 @@ services:
       - redis
       - memcached
       - meilisearch
-      - minio
       - mailpit
   laravel.queue:
     build:
@@ -67,10 +68,16 @@ services:
       - redis
       - memcached
       - meilisearch
-      - minio
       - mailpit
     restart: on-failure
-    command: 'php artisan queue:work --sleep=10 --timeout=0 --tries=3 --queue=high,default,low'
+    entrypoint: >
+      /bin/sh -c "
+      if [ ! -z \"$WWWUSER\" ]; then usermod -u \"$WWWUSER\" sail; fi &&
+      chown -R sail:sail /var/www/html/storage /var/www/html/bootstrap/cache &&
+      chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache &&
+      gosu sail php artisan waitfordb &&
+      exec gosu sail php artisan queue:work --sleep=10 --timeout=0 --tries=3 --queue=high,default,low
+      "
   laravel.cron:
     build:
       context: .
@@ -96,10 +103,16 @@ services:
       - redis
       - memcached
       - meilisearch
-      - minio
       - mailpit
     restart: on-failure
-    command: 'php artisan schedule:run'
+    entrypoint: >
+      /bin/sh -c "
+      if [ ! -z \"$WWWUSER\" ]; then usermod -u \"$WWWUSER\" sail; fi &&
+      chown -R sail:sail /var/www/html/storage /var/www/html/bootstrap/cache &&
+      chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache &&
+      gosu sail php artisan waitfordb &&
+      exec gosu sail php artisan schedule:run
+      "
   mariadb:
     image: 'mariadb:10'
     ports:
@@ -171,45 +184,6 @@ services:
       - '${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025'
     networks:
       - sail
-  minio:
-    image: 'minio/minio:latest'
-    ports:
-      - '${FORWARD_MINIO_PORT:-9000}:9000'
-      - '${FORWARD_MINIO_CONSOLE_PORT:-8900}:8900'
-    environment:
-      MINIO_ROOT_USER: '${AWS_ACCESS_KEY_ID:-sail}'
-      MINIO_ROOT_PASSWORD: '${AWS_SECRET_ACCESS_KEY:-password}'
-    volumes:
-      - 'sail-minio:/data/minio'
-    networks:
-      - sail
-    command: 'minio server /data/minio --console-address ":8900"'
-    healthcheck:
-      test:
-        - CMD
-        - curl
-        - '-f'
-        - 'http://localhost:9000/minio/health/live'
-      retries: 3
-      timeout: 5s
-  createbuckets:
-    image: minio/mc
-    depends_on:
-      minio:
-        condition: service_healthy
-    environment:
-      AWS_ACCESS_KEY_ID: '${AWS_ACCESS_KEY_ID:-sail}'
-      AWS_SECRET_ACCESS_KEY: '${AWS_SECRET_ACCESS_KEY:-password}'
-      AWS_BUCKET: '${AWS_BUCKET:-local}'
-    entrypoint: >
-      /bin/sh -c "
-      /usr/bin/mc alias set myminio http://minio:9000 \${AWS_ACCESS_KEY_ID} \${AWS_SECRET_ACCESS_KEY};
-      /usr/bin/mc mb myminio/\${AWS_BUCKET};
-      /usr/bin/mc anonymous set download myminio/\${AWS_BUCKET};
-      exit 0;
-      "
-    networks:
-      - sail
 networks:
   sail:
     driver: bridge
@@ -219,6 +193,4 @@ volumes:
   sail-redis:
     driver: local
   sail-meilisearch:
-    driver: local
-  sail-minio:
     driver: local
