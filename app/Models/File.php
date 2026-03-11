@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * @property string $fileable_type
@@ -79,5 +80,39 @@ class File extends Model
     public function ufileable(): MorphTo
     {
         return $this->morphTo(type: 'fileable_type');
+    }
+
+    /**
+     * Get the original URL.
+     *
+     * @param string $value
+     * @return string
+     */
+    public function getOriginalUrlAttribute($value)
+    {
+        if ($this->type === self::TYPE_PHOTO && str_contains($value, '/photos/')) {
+            if (preg_match('/(photos\/.*)$/', $value, $matches)) {
+                return Storage::disk('s3')->url($matches[1]);
+            }
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get the CDN URL.
+     *
+     * @param string $value
+     * @return string
+     */
+    public function getCdnUrlAttribute($value)
+    {
+        if ($this->type === self::TYPE_PHOTO && str_contains($value, '/photos/')) {
+            if (preg_match('/(photos\/.*)$/', $value, $matches)) {
+                return Storage::disk('s3')->url($matches[1]);
+            }
+        }
+
+        return $value;
     }
 }
